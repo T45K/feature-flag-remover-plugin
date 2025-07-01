@@ -11,8 +11,8 @@ subprojects {
         mavenCentral()
     }
 
-    group = "com.github.t45k"
-    version = "0.1.2"
+    group = "io.github.t45k"
+    version = "1.0.0"
 
     dependencies {
         testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
