@@ -29,6 +29,33 @@ class Sample(
         }
 
         val c = @RemoveElseClauseAfterRelease("sample") if (true) "enabled" else "disabled"
+
+        // conditions in when expression
+        val d = when ("a") {
+            @RemoveAfterRelease("sample") "a" -> "a"
+            else -> "b"
+        }
+
+        val e = when ("a") {
+            is String -> @RemoveAfterRelease("sample") "a"
+            else -> "b"
+        }
+
+        val f = when ("a") {
+            is String -> @RemoveAfterRelease("sample") {
+                "a"
+            }
+
+            else -> "b"
+        }
+
+        val g = when ("a") {
+            is String -> {
+                @RemoveAfterRelease("sample") "a"
+            }
+
+            else -> "b"
+        }
     }
 
     @RemoveAfterRelease("sample")

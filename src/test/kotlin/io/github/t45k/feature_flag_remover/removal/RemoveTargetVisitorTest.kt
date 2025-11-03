@@ -174,6 +174,56 @@ class RemoveTargetVisitorTest {
     }
 
     @Test
+    fun `RemoveTargetVisitor finds annotated when condition`() {
+        // given
+        val visitor = RemoveTargetVisitor("sample")
+        val content = """
+            fun main() {
+                when ("foo") {
+                    @RemoveAfterRelease("sample") "foo" -> "foo"
+                    else -> "bar"
+                }
+            }
+        """.trimIndent()
+        val ktFile = createSingleKtFile(content)
+
+        // when
+        ktFile.accept(visitor)
+
+        // then
+        assertEquals(1, visitor.removeTargetElements.size)
+        assertEquals(
+            """@RemoveAfterRelease("sample") "foo" -> "foo"""",
+            content.substring(visitor.removeTargetElements[0].startOffset, visitor.removeTargetElements[0].endOffset),
+        )
+    }
+
+    @Test
+    fun `RemoveTargetVisitor finds annotated when body`() {
+        // given
+        val visitor = RemoveTargetVisitor("sample")
+        val content = """
+            fun main() {
+                when ("foo") {
+                    "foo" -> @RemoveAfterRelease("sample") "foo"
+                    else -> "bar"
+                }
+            }
+        """.trimIndent()
+        val ktFile = createSingleKtFile(content)
+
+        // when
+        ktFile.accept(visitor)
+
+        // then
+        assertEquals(1, visitor.removeTargetElements.size)
+        assertEquals(
+            """"foo" -> @RemoveAfterRelease("sample") "foo"""",
+            content.substring(visitor.removeTargetElements[0].startOffset, visitor.removeTargetElements[0].endOffset),
+        )
+    }
+
+    @Test
     fun `RemoveTargetVisitor finds multiple annotated elements`() {
         // given
         val visitor = RemoveTargetVisitor("sample")
