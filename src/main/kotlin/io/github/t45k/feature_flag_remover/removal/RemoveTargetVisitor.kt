@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.KtValueArgument
 import org.jetbrains.kotlin.psi.KtValueArgumentName
 import org.jetbrains.kotlin.psi.KtWhenConditionWithExpression
+import org.jetbrains.kotlin.psi.KtWhenEntry
 
 class RemoveTargetVisitor(private val targetName: String) : KtTreeVisitorVoid() {
     private val _removeTargetElements: MutableList<KtElement> = mutableListOf()
@@ -48,6 +49,7 @@ class RemoveTargetVisitor(private val targetName: String) : KtTreeVisitorVoid() 
             val removeTargetElement = when {
                 expression.isNamedArgument() -> expression.parent
                 expression.isWhenCondition() -> expression.parent.parent
+                expression.isWhenBody() -> expression.parent
                 else -> expression
             } as KtElement
 
@@ -89,4 +91,5 @@ class RemoveTargetVisitor(private val targetName: String) : KtTreeVisitorVoid() 
 
     private fun KtAnnotatedExpression.isNamedArgument(): Boolean = this.parent is KtValueArgument && this.parent.firstChild is KtValueArgumentName
     private fun KtAnnotatedExpression.isWhenCondition(): Boolean = this.parent is KtWhenConditionWithExpression
+    private fun KtAnnotatedExpression.isWhenBody(): Boolean = this.parent is KtWhenEntry
 }
