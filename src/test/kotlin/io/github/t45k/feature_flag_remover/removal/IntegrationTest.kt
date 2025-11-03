@@ -9,7 +9,7 @@ class IntegrationTest {
     fun test() = removeFeatureFlagContext {
         val classLoader = this::class.java.classLoader
         val before = classLoader.getResource("Before.kt")!!.readText()
-        val after = classLoader.getResource("After.kt")!!.readText()
+        val after = classLoader.getResource("After.kt")!!.readText().removePrefix("// @formatter:off\n")
 
         // expect
         assertEquals(
