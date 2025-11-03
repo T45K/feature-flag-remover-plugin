@@ -17,7 +17,7 @@ abstract class RemoveFeatureFlagTask : DefaultTask() {
     abstract val featureName: Property<String>
 
     init {
-        group = "feature-flag-remover"
+        group = "feature flag removal"
         description = "Remove feature flags from Kotlin source files"
     }
 
