@@ -1,9 +1,12 @@
+// @formatter:off
 class Sample(
 
 
 
 ) {
     fun sample() {
+
+
 
 
         listOf(
@@ -18,6 +21,7 @@ class Sample(
 
         val c = "enabled"
     }
+
 
 
     class Sample2
