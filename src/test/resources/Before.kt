@@ -56,6 +56,10 @@ class Sample(
 
             else -> "b"
         }
+
+        // multiple features
+        @RemoveAfterRelease("sample", "sample2")
+        val h = "sample and sample2"
     }
 
     @RemoveAfterRelease("sample")

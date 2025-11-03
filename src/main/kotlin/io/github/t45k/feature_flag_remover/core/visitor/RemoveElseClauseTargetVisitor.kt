@@ -1,4 +1,4 @@
-package io.github.t45k.feature_flag_remover.removal
+package io.github.t45k.feature_flag_remover.core.visitor
 
 import io.github.t45k.feature_flag_remover.api.RemoveElseClauseAfterRelease
 import org.jetbrains.kotlin.psi.KtIfExpression
