@@ -113,6 +113,27 @@ class RemoveTargetVisitorTest {
         // given
         val visitor = RemoveTargetVisitor("sample")
         val content = """
+            fun main(@RemoveAfterRelease("sample") foo: String) {
+            }
+        """.trimIndent()
+        val ktFile = createSingleKtFile(content)
+
+        // when
+        ktFile.accept(visitor)
+
+        // then
+        assertEquals(1, visitor.removeTargetElements.size)
+        assertEquals(
+            """@RemoveAfterRelease("sample") foo: String""",
+            content.substring(visitor.removeTargetElements[0].startOffset, visitor.removeTargetElements[0].endOffset),
+        )
+    }
+
+    @Test
+    fun `RemoveTargetVisitor finds annotated argument`() {
+        // given
+        val visitor = RemoveTargetVisitor("sample")
+        val content = """
             fun main() {
                 println(@RemoveAfterRelease("sample") true)
             }
@@ -131,11 +152,12 @@ class RemoveTargetVisitorTest {
     }
 
     @Test
-    fun `RemoveTargetVisitor finds annotated argument`() {
+    fun `RemoveTargetVisitor finds annotated argument with named argument`() {
         // given
         val visitor = RemoveTargetVisitor("sample")
         val content = """
-            fun main(@RemoveAfterRelease("sample") foo: String) {
+            fun main() {
+                println(message = @RemoveAfterRelease("sample") true)
             }
         """.trimIndent()
         val ktFile = createSingleKtFile(content)
@@ -146,7 +168,7 @@ class RemoveTargetVisitorTest {
         // then
         assertEquals(1, visitor.removeTargetElements.size)
         assertEquals(
-            """@RemoveAfterRelease("sample") foo: String""",
+            """message = @RemoveAfterRelease("sample") true""",
             content.substring(visitor.removeTargetElements[0].startOffset, visitor.removeTargetElements[0].endOffset),
         )
     }
