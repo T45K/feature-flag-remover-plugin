@@ -11,6 +11,8 @@ import org.jetbrains.kotlin.psi.KtPrimaryConstructor
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtSecondaryConstructor
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
+import org.jetbrains.kotlin.psi.KtValueArgument
+import org.jetbrains.kotlin.psi.KtValueArgumentName
 
 class RemoveTargetVisitor(private val targetName: String) : KtTreeVisitorVoid() {
     private val _removeTargetElements: MutableList<KtElement> = mutableListOf()
@@ -42,7 +44,7 @@ class RemoveTargetVisitor(private val targetName: String) : KtTreeVisitorVoid() 
 
     override fun visitAnnotatedExpression(expression: KtAnnotatedExpression) {
         if (expression.isAnnotatedAsRemoveTarget()) {
-            _removeTargetElements.add(expression)
+            _removeTargetElements.add(if (expression.isNamedArgument()) expression.parent as KtElement else expression)
         } else {
             return super.visitAnnotatedExpression(expression)
         }
@@ -77,4 +79,6 @@ class RemoveTargetVisitor(private val targetName: String) : KtTreeVisitorVoid() 
             entry.shortName?.asString() == RemoveAfterRelease::class.simpleName &&
                 entry.valueArguments.any { arg -> arg.getArgumentExpression()?.text == "\"$targetName\"" }
         }
+
+    private fun KtAnnotatedExpression.isNamedArgument(): Boolean = this.parent is KtValueArgument && this.parent.firstChild is KtValueArgumentName
 }
