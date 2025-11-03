@@ -1,9 +1,8 @@
 package io.github.t45k.feature_flag_remover.core.visitor
 
-import io.github.t45k.feature_flag_remover.api.RemoveAfterRelease
-import io.github.t45k.feature_flag_remover.core.visitor.RemoveTarget.None
-import io.github.t45k.feature_flag_remover.core.visitor.RemoveTarget.OnlyTargetNames
-import io.github.t45k.feature_flag_remover.core.visitor.RemoveTarget.WholeElement
+import io.github.t45k.feature_flag_remover.core.visitor.RemoveTargetVisitor.RemoveTarget.None
+import io.github.t45k.feature_flag_remover.core.visitor.RemoveTargetVisitor.RemoveTarget.OnlyTargetNames
+import io.github.t45k.feature_flag_remover.core.visitor.RemoveTargetVisitor.RemoveTarget.WholeElement
 import org.jetbrains.kotlin.psi.KtAnnotated
 import org.jetbrains.kotlin.psi.KtAnnotatedExpression
 import org.jetbrains.kotlin.psi.KtClassOrObject
@@ -75,7 +74,21 @@ class RemoveTargetVisitor(private val targetName: String) : KtTreeVisitorVoid() 
         }
     }
 
-    private fun KtAnnotated.decideRemoveTargetElements() = annotationEntries.decideRemoveTargetElements<RemoveAfterRelease>(targetName)
+    private fun KtAnnotated.decideRemoveTargetElements(): RemoveTarget {
+        val targetAnnotation = annotationEntries.firstOrNull { it.shortName?.asString() == RemoveTargetVisitor::class.simpleName } ?: return None
+        val targetFeatureNames = targetAnnotation.valueArguments.filter { it.getArgumentExpression()?.text == "\"$targetName\"" }
+        return when {
+            targetFeatureNames.isEmpty() -> None
+            targetFeatureNames.size == targetAnnotation.valueArguments.size -> WholeElement
+            else -> OnlyTargetNames(targetFeatureNames.map { it.asElement() })
+        }
+    }
+
+    sealed interface RemoveTarget {
+        data object WholeElement : RemoveTarget
+        data class OnlyTargetNames(val targetNames: List<KtElement>) : RemoveTarget
+        data object None : RemoveTarget
+    }
 
     private fun KtAnnotatedExpression.isNamedArgument(): Boolean = this.parent is KtValueArgument && this.parent.firstChild is KtValueArgumentName
     private fun KtAnnotatedExpression.isWhenCondition(): Boolean = this.parent is KtWhenConditionWithExpression
