@@ -21,65 +21,45 @@ class RemoveTargetVisitor(private val targetName: String) : KtTreeVisitorVoid() 
     val removeTargetElements: List<KtElement> get() = _removeTargetElements
 
     override fun visitClassOrObject(classOrObject: KtClassOrObject) {
-        if (classOrObject.isAnnotatedAsRemoveTarget()) {
-            _removeTargetElements.add(classOrObject)
-        } else {
-            super.visitClassOrObject(classOrObject)
-        }
+        visitEachElement(classOrObject, { super.visitClassOrObject(it) })
     }
 
     override fun visitProperty(property: KtProperty) {
-        if (property.isAnnotatedAsRemoveTarget()) {
-            _removeTargetElements.add(property)
-        } else {
-            super.visitProperty(property)
-        }
+        visitEachElement(property, { super.visitProperty(it) })
     }
 
     override fun visitParameter(parameter: KtParameter) {
-        if (parameter.isAnnotatedAsRemoveTarget()) {
-            _removeTargetElements.add(parameter)
-        } else {
-            super.visitParameter(parameter)
-        }
+        visitEachElement(parameter, { super.visitParameter(it) })
     }
 
     override fun visitAnnotatedExpression(expression: KtAnnotatedExpression) {
-        if (expression.isAnnotatedAsRemoveTarget()) {
-            val removeTargetElement = when {
+        visitEachElement(expression, { super.visitAnnotatedExpression(it) }) {
+            when {
                 expression.isNamedArgument() -> expression.parent
                 expression.isWhenCondition() -> expression.parent.parent
                 expression.isWhenBody() -> expression.parent
                 else -> expression
             } as KtElement
-
-            _removeTargetElements.add(removeTargetElement)
-        } else {
-            return super.visitAnnotatedExpression(expression)
         }
     }
 
     override fun visitNamedFunction(function: KtNamedFunction) {
-        if (function.isAnnotatedAsRemoveTarget()) {
-            _removeTargetElements.add(function)
-        } else {
-            return super.visitNamedFunction(function)
-        }
+        visitEachElement(function, { super.visitNamedFunction(it) })
     }
 
     override fun visitPrimaryConstructor(constructor: KtPrimaryConstructor) {
-        if (constructor.isAnnotatedAsRemoveTarget()) {
-            _removeTargetElements.add(constructor)
-        } else {
-            return super.visitPrimaryConstructor(constructor)
-        }
+        visitEachElement(constructor, { super.visitPrimaryConstructor(it) })
     }
 
     override fun visitSecondaryConstructor(constructor: KtSecondaryConstructor) {
-        if (constructor.isAnnotatedAsRemoveTarget()) {
-            _removeTargetElements.add(constructor)
+        visitEachElement(constructor, { super.visitSecondaryConstructor(it) })
+    }
+
+    private fun <E : KtAnnotated> visitEachElement(element: E, continueVisiting: (E) -> Unit, selectElement: (E) -> KtElement = { it }) {
+        if (element.isAnnotatedAsRemoveTarget()) {
+            _removeTargetElements += selectElement(element)
         } else {
-            super.visitSecondaryConstructor(constructor)
+            continueVisiting(element)
         }
     }
 
