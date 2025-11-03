@@ -23,17 +23,17 @@ class Sample(
 
         // conditions in when expression
         val d = when ("a") {
-            -> "a"
+
             else -> "b"
         }
 
         val e = when ("a") {
-            is String ->
+
             else -> "b"
         }
 
         val f = when ("a") {
-            is String ->
+
 
             else -> "b"
         }
