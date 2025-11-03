@@ -1,5 +1,6 @@
 package io.github.t45k.feature_flag_remover.core.visitor
 
+import io.github.t45k.feature_flag_remover.api.RemoveAfterRelease
 import io.github.t45k.feature_flag_remover.core.visitor.RemoveTargetVisitor.RemoveTarget.None
 import io.github.t45k.feature_flag_remover.core.visitor.RemoveTargetVisitor.RemoveTarget.OnlyTargetNames
 import io.github.t45k.feature_flag_remover.core.visitor.RemoveTargetVisitor.RemoveTarget.WholeElement
@@ -75,7 +76,7 @@ class RemoveTargetVisitor(private val targetName: String) : KtTreeVisitorVoid() 
     }
 
     private fun KtAnnotated.decideRemoveTargetElements(): RemoveTarget {
-        val targetAnnotation = annotationEntries.firstOrNull { it.shortName?.asString() == RemoveTargetVisitor::class.simpleName } ?: return None
+        val targetAnnotation = annotationEntries.firstOrNull { it.shortName?.asString() == RemoveAfterRelease::class.simpleName } ?: return None
         val targetFeatureNames = targetAnnotation.valueArguments.filter { it.getArgumentExpression()?.text == "\"$targetName\"" }
         return when {
             targetFeatureNames.isEmpty() -> None
