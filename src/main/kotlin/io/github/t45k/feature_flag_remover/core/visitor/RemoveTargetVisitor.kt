@@ -1,6 +1,9 @@
-package io.github.t45k.feature_flag_remover.removal
+package io.github.t45k.feature_flag_remover.core.visitor
 
 import io.github.t45k.feature_flag_remover.api.RemoveAfterRelease
+import io.github.t45k.feature_flag_remover.core.visitor.RemoveTarget.None
+import io.github.t45k.feature_flag_remover.core.visitor.RemoveTarget.OnlyTargetNames
+import io.github.t45k.feature_flag_remover.core.visitor.RemoveTarget.WholeElement
 import org.jetbrains.kotlin.psi.KtAnnotated
 import org.jetbrains.kotlin.psi.KtAnnotatedExpression
 import org.jetbrains.kotlin.psi.KtClassOrObject
@@ -21,19 +24,19 @@ class RemoveTargetVisitor(private val targetName: String) : KtTreeVisitorVoid() 
     val removeTargetElements: List<KtElement> get() = _removeTargetElements
 
     override fun visitClassOrObject(classOrObject: KtClassOrObject) {
-        visitEachElement(classOrObject, { super.visitClassOrObject(it) })
+        visitCandidate(classOrObject, { super.visitClassOrObject(it) })
     }
 
     override fun visitProperty(property: KtProperty) {
-        visitEachElement(property, { super.visitProperty(it) })
+        visitCandidate(property, { super.visitProperty(it) })
     }
 
     override fun visitParameter(parameter: KtParameter) {
-        visitEachElement(parameter, { super.visitParameter(it) })
+        visitCandidate(parameter, { super.visitParameter(it) })
     }
 
     override fun visitAnnotatedExpression(expression: KtAnnotatedExpression) {
-        visitEachElement(expression, { super.visitAnnotatedExpression(it) }) {
+        visitCandidate(expression, { super.visitAnnotatedExpression(it) }) {
             when {
                 expression.isNamedArgument() -> expression.parent
                 expression.isWhenCondition() -> expression.parent.parent
@@ -44,30 +47,35 @@ class RemoveTargetVisitor(private val targetName: String) : KtTreeVisitorVoid() 
     }
 
     override fun visitNamedFunction(function: KtNamedFunction) {
-        visitEachElement(function, { super.visitNamedFunction(it) })
+        visitCandidate(function, { super.visitNamedFunction(it) })
     }
 
     override fun visitPrimaryConstructor(constructor: KtPrimaryConstructor) {
-        visitEachElement(constructor, { super.visitPrimaryConstructor(it) })
+        visitCandidate(constructor, { super.visitPrimaryConstructor(it) })
     }
 
     override fun visitSecondaryConstructor(constructor: KtSecondaryConstructor) {
-        visitEachElement(constructor, { super.visitSecondaryConstructor(it) })
+        visitCandidate(constructor, { super.visitSecondaryConstructor(it) })
     }
 
-    private fun <E : KtAnnotated> visitEachElement(element: E, continueVisiting: (E) -> Unit, selectElement: (E) -> KtElement = { it }) {
-        if (element.isAnnotatedAsRemoveTarget()) {
-            _removeTargetElements += selectElement(element)
-        } else {
-            continueVisiting(element)
+    private fun <E : KtAnnotated> visitCandidate(element: E, continueVisiting: (E) -> Unit, selectElement: (E) -> KtElement = { it }) {
+        when (val removeTarget = element.decideRemoveTargetElements()) {
+            WholeElement -> {
+                _removeTargetElements += selectElement(element)
+            }
+
+            is OnlyTargetNames -> {
+                _removeTargetElements += removeTarget.targetNames
+                continueVisiting(element)
+            }
+
+            None -> {
+                continueVisiting(element)
+            }
         }
     }
 
-    private fun KtAnnotated.isAnnotatedAsRemoveTarget(): Boolean =
-        this.annotationEntries.any { entry ->
-            entry.shortName?.asString() == RemoveAfterRelease::class.simpleName &&
-                entry.valueArguments.any { arg -> arg.getArgumentExpression()?.text == "\"$targetName\"" }
-        }
+    private fun KtAnnotated.decideRemoveTargetElements() = annotationEntries.decideRemoveTargetElements<RemoveAfterRelease>(targetName)
 
     private fun KtAnnotatedExpression.isNamedArgument(): Boolean = this.parent is KtValueArgument && this.parent.firstChild is KtValueArgumentName
     private fun KtAnnotatedExpression.isWhenCondition(): Boolean = this.parent is KtWhenConditionWithExpression

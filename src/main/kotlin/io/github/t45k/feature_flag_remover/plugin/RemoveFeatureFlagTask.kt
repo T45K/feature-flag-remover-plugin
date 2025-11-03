@@ -1,7 +1,7 @@
 package io.github.t45k.feature_flag_remover.plugin
 
-import io.github.t45k.feature_flag_remover.removal.ProjectSetup
-import io.github.t45k.feature_flag_remover.removal.removeFeatureFlagContext
+import io.github.t45k.feature_flag_remover.core.ProjectSetup
+import io.github.t45k.feature_flag_remover.core.removeFeatureFlagContext
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input

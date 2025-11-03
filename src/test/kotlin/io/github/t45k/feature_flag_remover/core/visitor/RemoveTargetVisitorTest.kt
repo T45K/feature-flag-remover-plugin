@@ -1,4 +1,4 @@
-package io.github.t45k.feature_flag_remover.removal
+package io.github.t45k.feature_flag_remover.core.visitor
 
 import io.github.t45k.feature_flag_remover.util.createSingleKtFile
 import kotlin.test.Test
@@ -256,6 +256,29 @@ class RemoveTargetVisitorTest {
                     val bar = "baz"
             """.trimIndent(),
             content.substring(visitor.removeTargetElements[1].startOffset, visitor.removeTargetElements[1].endOffset),
+        )
+    }
+
+    @Test
+    fun `RemoveTargetVisitor finds element with multiple features`() {
+        // given
+        val visitor = RemoveTargetVisitor("sample")
+        val content = """
+            fun main() {
+                @RemoveAfterRelease("sample", "sample2")
+                val foo = "bar"
+            }
+        """.trimIndent()
+        val ktFile = createSingleKtFile(content)
+
+        // when
+        ktFile.accept(visitor)
+
+        // then
+        assertEquals(1, visitor.removeTargetElements.size)
+        assertEquals(
+            """"sample"""",
+            content.substring(visitor.removeTargetElements[0].startOffset, visitor.removeTargetElements[0].endOffset),
         )
     }
 }
