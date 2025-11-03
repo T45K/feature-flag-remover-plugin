@@ -1,7 +1,7 @@
 plugins {
-    kotlin("jvm") version "2.0.0"
+    kotlin("jvm") version "2.2.21"
 
-    id("com.gradle.plugin-publish") version "1.3.1"
+    id("com.gradle.plugin-publish") version "2.0.0"
 }
 
 repositories {
@@ -10,10 +10,10 @@ repositories {
 }
 
 group = "io.github.t45k"
-version = "1.0.1"
+version = "1.0.2"
 
 dependencies {
-    implementation("com.github.T45K:feature-flag-remover:1.0.0")
+    implementation("com.github.t45k:feature-flag-remover:1.0.2")
     implementation("org.jetbrains.kotlin:kotlin-compiler-embeddable")
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin")
 
