@@ -14,10 +14,10 @@ version = "1.0.2"
 
 dependencies {
     implementation("com.github.t45k:feature-flag-remover:1.0.2")
-    implementation("org.jetbrains.kotlin:kotlin-compiler-embeddable")
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin")
+    implementation(kotlin("compiler-embeddable"))
+    implementation(kotlin("gradle-plugin"))
 
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation(kotlin("test-junit5"))
     testImplementation(rootProject.libs.junit.jupiter.engine)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
