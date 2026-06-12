@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "2.2.21"
+    kotlin("jvm") version "2.4.0"
 
     id("com.gradle.plugin-publish") version "2.0.0"
 }
@@ -10,10 +10,10 @@ repositories {
 }
 
 group = "io.github.t45k"
-version = "1.0.2"
+version = "1.0.3"
 
 dependencies {
-    implementation("com.github.t45k:feature-flag-remover:1.0.2")
+    implementation("com.github.t45k:feature-flag-remover:1.0.3")
     implementation(kotlin("compiler-embeddable"))
     implementation(kotlin("gradle-plugin"))
 
@@ -24,7 +24,7 @@ dependencies {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
