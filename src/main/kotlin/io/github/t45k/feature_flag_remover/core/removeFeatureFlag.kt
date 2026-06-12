@@ -2,6 +2,7 @@ package io.github.t45k.feature_flag_remover.core
 
 import io.github.t45k.feature_flag_remover.core.visitor.RemoveElseClauseTargetVisitor
 import io.github.t45k.feature_flag_remover.core.visitor.RemoveTargetVisitor
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
@@ -14,12 +15,13 @@ fun removeFeatureFlagContext(block: ProjectSetup.() -> Unit) {
     }
 }
 
+@OptIn(K1Deprecation::class, CompilerConfiguration.Internals::class)
 class ProjectSetup : AutoCloseable {
     private val disposable = Disposer.newDisposable()
     private val environment = KotlinCoreEnvironment.createForProduction(
         disposable,
         CompilerConfiguration(),
-        EnvironmentConfigFiles.JVM_CONFIG_FILES
+        EnvironmentConfigFiles.JVM_CONFIG_FILES,
     )
     private val project = environment.project
     private val psiFactory = KtPsiFactory(project)
