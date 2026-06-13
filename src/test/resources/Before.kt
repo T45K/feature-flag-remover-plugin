@@ -15,8 +15,13 @@ class Sample(
 
         listOf(
             @RemoveAfterRelease("sample") // value argument
-            true
+            true,
         )
+
+        val list = [
+            @RemoveAfterRelease("sample")
+            true,
+        ] // collection literal
 
         listOf(element = @RemoveAfterRelease("sample") true) // named argument
 

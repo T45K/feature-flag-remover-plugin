@@ -27,10 +27,10 @@ abstract class RemoveFeatureFlagTask : DefaultTask() {
         val sourceSets = project.extensions.findByName("sourceSets") as? SourceSetContainer
 
         val sourceDirectories = sourceSets?.flatMap { it.allSource.srcDirs }
-            ?: listOf(
+            ?: [
                 File(project.projectDir, "src/main/kotlin"),
                 File(project.projectDir, "src/test/kotlin"),
-            )
+            ]
 
         println("Start removing '$feature' feature flag from the following directories:\n${sourceDirectories.joinToString("\n") { "\t$it" }}")
 

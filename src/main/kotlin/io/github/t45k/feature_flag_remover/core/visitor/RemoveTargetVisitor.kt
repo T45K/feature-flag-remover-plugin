@@ -20,8 +20,8 @@ import org.jetbrains.kotlin.psi.KtWhenConditionWithExpression
 import org.jetbrains.kotlin.psi.KtWhenEntry
 
 class RemoveTargetVisitor(private val targetName: String) : KtTreeVisitorVoid() {
-    private val _removeTargetElements: MutableList<KtElement> = mutableListOf()
-    val removeTargetElements: List<KtElement> get() = _removeTargetElements
+    val removeTargetElements: List<KtElement>
+        field: MutableList<KtElement> = []
 
     override fun visitClassOrObject(classOrObject: KtClassOrObject) {
         visitCandidate(classOrObject, { super.visitClassOrObject(it) })
@@ -61,11 +61,11 @@ class RemoveTargetVisitor(private val targetName: String) : KtTreeVisitorVoid() 
     private fun <E : KtAnnotated> visitCandidate(element: E, continueVisiting: (E) -> Unit, selectElement: (E) -> KtElement = { it }) {
         when (val removeTarget = element.decideRemoveTargetElements()) {
             WholeElement -> {
-                _removeTargetElements += selectElement(element)
+                removeTargetElements += selectElement(element)
             }
 
             is OnlyTargetNames -> {
-                _removeTargetElements += removeTarget.targetNames
+                removeTargetElements += removeTarget.targetNames
                 continueVisiting(element)
             }
 

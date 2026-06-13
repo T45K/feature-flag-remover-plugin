@@ -28,6 +28,12 @@ java {
     }
 }
 
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xcollection-literals")
+    }
+}
+
 tasks.named<Test>("test") {
     useJUnitPlatform()
 }

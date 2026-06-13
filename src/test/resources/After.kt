@@ -13,6 +13,10 @@ class Sample(
 
         )
 
+        val list = [
+
+        ] // collection literal
+
         listOf() // named argument
 
         val sample = Sample() // constructor argument

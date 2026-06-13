@@ -6,8 +6,8 @@ import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.psiUtil.getAnnotationEntries
 
 class RemoveElseClauseTargetVisitor(private val targetName: String) : KtTreeVisitorVoid() {
-    private val _removeTargetElements: MutableList<KtIfExpression> = mutableListOf()
-    val removeTargetElements: List<KtIfExpression> get() = _removeTargetElements
+    val removeTargetElements: List<KtIfExpression>
+        field: MutableList<KtIfExpression> = []
 
     override fun visitIfExpression(expression: KtIfExpression) {
         val isAnnotatedAsRemoveTarget = expression.getAnnotationEntries().any { entry ->
@@ -16,7 +16,7 @@ class RemoveElseClauseTargetVisitor(private val targetName: String) : KtTreeVisi
         }
 
         if (isAnnotatedAsRemoveTarget) {
-            _removeTargetElements.add(expression)
+            removeTargetElements.add(expression)
         } else {
             super.visitIfExpression(expression)
         }
